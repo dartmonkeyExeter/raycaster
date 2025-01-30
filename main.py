@@ -34,6 +34,7 @@ fov = 70
 ray_step = 1  # how many pixels to move along each step in the raycasting process
 
 walls = []
+rays = []
 
 for y in range(7):
     for x in range(10):
@@ -120,7 +121,22 @@ def renderer():
     # distance to projection plane = 500
     # distance = distance to wall (the rays)
 
-    
+    for i in range(fov):
+        ray_rot = player_rot - (fov // 2) + i
+        distance = cast_ray(ray_rot)
+        if distance:
+            ray_dx = distance * math.cos(math.radians(ray_rot))
+            ray_dy = distance * math.sin(math.radians(ray_rot))
+            ray_end_x = player_x + ray_dx
+            ray_end_y = player_y + ray_dy
+            
+            # Calculate the height of the wall slice
+            slice_height = 50 / distance * 500
+            # Calculate the top and bottom of the wall slice
+            slice_top = 175 - slice_height // 2
+            slice_bottom = 175 + slice_height // 2
+            # Draw the wall slice
+            pygame.draw.line(screen, RED, (500 + i, slice_top), (500 + i, slice_bottom), 1)
 
 running = True
 
@@ -128,6 +144,7 @@ while running:
     screen.fill(BLACK)
     draw_map()
     render_rays()  # Render all the rays
+    renderer()
     draw_player()
     pygame.display.flip()
 
